@@ -6,6 +6,7 @@ import * as http from 'http';
 import * as path from 'path';
 import { Server } from 'socket.io';
 import timesyncServer from 'timesync/server';
+import { setupExpressErrorHandler } from '@sentry/node';
 import './lib/dayjs';
 import { expressLogger } from './lib/logger';
 import apiRouter from './routers/api/index';
@@ -47,6 +48,9 @@ app.get('/status', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ error: 'ROUTE_NOT_DEFINED' });
 });
+
+// Sentry error handler must be registered before any other error middleware and after all controllers
+setupExpressErrorHandler(app);
 
 app.use((err, req, res, next) => {
   console.log(err);
